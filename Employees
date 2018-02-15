@@ -1,0 +1,39 @@
+-- CURSOR LOOP and 3 JOINS - calculate which projects(name of the project and of the location) has each department (name of the location)and who is the responsable for them (name of the manager)
+
+SET SERVEROUTPUT ON SIZE 1000000;
+
+DECLARE
+
+  CURSOR cur_proj IS
+    SELECT * FROM PAULA.PROJECT;
+  v_pname PAULA.PROJECT.PNAME%TYPE;
+  v_plocation PAULA.PROJECT.PLOCATION%TYPE;
+  v_dname PAULA.DEPARTMENT.DNAME%TYPE;
+  v_dlocation PAULA.DEPT_LOCATIONS.DLOCATION%TYPE;
+  v_fname PAULA.EMPLOYEE.FNAME%TYPE;
+  n_mgrssn PAULA.DEPARTMENT.MGRSSN%TYPE;
+  n_count NUMBER := 0;
+  
+BEGIN
+
+  FOR loop_proj in cur_proj
+  LOOP
+  SELECT p.PNAME, p.PLOCATION, d.DNAME, dl.DLOCATION, e.FNAME, d.MGRSSN
+  INTO v_pname, v_plocation, v_dname, v_dlocation, v_fname, n_mgrssn
+  FROM PAULA.PROJECT p
+  INNER JOIN PAULA.DEPARTMENT d
+  ON p.DNUM = d.DNUMBER AND loop_proj.PNAME LIKE p.PNAME 
+  INNER JOIN PAULA.DEPT_LOCATIONS dl 
+  ON d.DNUMBER = dl.DNUMBER
+  INNER JOIN PAULA.EMPLOYEE e
+  ON d.MGRSSN = e.SSN;
+  
+  SELECT COUNT (e.MINIT) INTO n_count
+  FROM PAULA.EMPLOYEE e
+  WHERE e.SUPERSSN = n_mgrssn;
+  
+  DBMS_OUTPUT.PUT_LINE('Name of the project: ' || v_pname || ' in ' || v_plocation || ', Department: ' || v_dname || ' in ' || v_dlocation || ' managed by ' || v_fname || ' (' || n_count || ' employees)');
+  
+  END LOOP;
+  
+END;
