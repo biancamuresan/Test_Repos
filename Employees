@@ -28,6 +28,8 @@ BEGIN
   INNER JOIN PAULA.EMPLOYEE e
   ON d.MGRSSN = e.SSN;
   
+  DBMS_OUTPUT.PUT_LINE ('New line!!! Version 2!!!');
+  
   SELECT COUNT (e.MINIT) INTO n_count
   FROM PAULA.EMPLOYEE e
   WHERE e.SUPERSSN = n_mgrssn;
